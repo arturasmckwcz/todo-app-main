@@ -1,32 +1,37 @@
-const fallbackTodos = [
-  { id: 5, title: 'Go sleep', checked: false },
-  { id: 4, title: 'Take a major dump', checked: false },
-  { id: 3, title: 'Do nothing', checked: false },
-  { id: 2, title: 'Walk the dog', checked: true },
-  { id: 1, title: 'Wake up', checked: true },
-];
-const state = { todos: fallbackTodos, filter: 'all', theme: 'light' };
+import createState from './state.js';
+import {
+  moveArrayItem,
+  getRandomTodosFromBaconipsum,
+  createLogger,
+} from './utils.js';
+import fallbackTodos from './fallbackTodos.js';
 
-function setTodos(newTodos) {
-  if (Array.isArray(newTodos)) {
-    state.todos = newTodos;
-    renderList();
-  }
-}
+const [todos, setTodos] = createState({
+  initialState: { list: fallbackTodos, filter: 'all', theme: 'light' },
+  validate: function ({ list }) {
+    return Array.isArray(list);
+  },
+  render: renderTodosList,
+});
 
-function setFilter(newFilter) {
-  if (['all', 'active', 'completed'].includes(newFilter)) {
-    state.filter = newFilter;
-    renderList();
-  }
-}
+const [filter, setFilter] = createState({
+  initialState: { value: 'all' },
+  validate: function ({ value }) {
+    return ['all', 'active', 'completed'].includes(value);
+  },
+  render: renderTodosList,
+});
 
-function setTheme(newTheme) {
-  if (['light', 'dark'].includes(newTheme)) {
-    state.theme = newTheme;
-    renderNewTheme();
-  }
-}
+const [theme, setTheme] = createState({
+  initialState: { value: 'light' },
+  validate: function ({ value }) {
+    return ['light', 'dark'].includes(value);
+  },
+  render: renderNewTheme,
+});
+
+const todosLogger = createLogger('TODOS');
+const filterLogger = createLogger('FILTER');
 
 const dragClassName = 'draggable';
 
@@ -42,36 +47,50 @@ const activeBtn = document.querySelector('#active');
 const completedBtn = document.querySelector('#completed');
 
 window.addEventListener('load', () => {
+  renderTodosList();
+  return;
   getRandomTodosFromBaconipsum({})
     .then(todos => setTodos(todos))
     .catch(console.error)
-    .finally(() => renderList());
+    .finally(() => renderTodosList());
 });
 
 enableDragging();
 
 themeBtn.addEventListener('click', () => {
-  setTheme(state.theme === 'light' ? 'dark' : 'light');
+  setTheme(theme.value === 'light' ? { value: 'dark' } : { value: 'light' });
 });
 
-function renderNewTheme() {
-  const isThemeLight = state.theme === 'light';
+function renderNewTheme(theme) {
+  const isThemeLight = theme.value === 'light';
 
   themeBtn.innerHTML = `<img src="${
     isThemeLight ? 'images/icon-moon.svg' : 'images/icon-sun.svg'
   }" alt="theme" />`;
 
   body.classList.remove(isThemeLight ? 'dark' : 'light');
-  body.classList.add(state.theme);
+  body.classList.add(theme.value);
 }
 
-function renderList() {
+form.addEventListener('submit', e => {
+  e.preventDefault();
+
+  if (todoInput.value)
+    setTodos({
+      list: [
+        { id: todos.list.length + 1, title: todoInput.value, checked: false },
+        ...todos.list,
+      ],
+    });
+});
+
+function renderTodosList() {
   todosList.innerHTML = '';
-  state.todos
+  todos.list
     .filter(({ checked }) =>
-      state.filter === 'active'
+      filter.value === 'active'
         ? !checked
-        : state.filter === 'completed'
+        : filter.value === 'completed'
         ? checked
         : true,
     )
@@ -82,57 +101,49 @@ function renderList() {
       li.classList.add(dragClassName);
       todosList.appendChild(li);
 
-      const checkedInput = document.createElement('input');
-      checkedInput.type = 'checkbox';
-      checkedInput.checked = todo.checked;
-      checkedInput.addEventListener('change', () => {
-        todo.checked = checkedInput.checked;
-        setTodos(state.todos);
-        renderList();
+      const checkedBtn = document.createElement('button');
+      checkedBtn.innerHTML = todo.checked
+        ? '<img src="images/icon-check.svg" alt="delete"/>'
+        : '';
+      checkedBtn.addEventListener('click', () => {
+        todo.checked = !todo.checked;
+        setTodos(todos.todos);
+        renderTodosList();
       });
-      li.appendChild(checkedInput);
+      li.appendChild(checkedBtn);
 
       const title = document.createElement('p');
       title.textContent = todo.title;
       li.appendChild(title);
 
       const delBtn = document.createElement('button');
-      const deleteIcon = document.createElement('img');
-      deleteIcon.src = 'images/icon-cross.svg';
-      delBtn.appendChild(deleteIcon);
+      delBtn.innerHTML = '<img src="images/icon-cross.svg" alt="delete"/>';
       delBtn.addEventListener('click', () => {
-        state.todos = state.todos.filter(element => element !== todo);
-        setTodos(state.todos);
-        renderList();
+        todos.todos = todos.todos.filter(element => element !== todo);
+        setTodos(todos.todos);
+        renderTodosList();
       });
       li.appendChild(delBtn);
     });
 
-  const itemsActive = state.todos.filter(({ checked }) => !checked).length;
+  const itemsActive = todos.list.filter(({ checked }) => !checked).length;
   todosLeft.textContent = `${itemsActive} item${
     itemsActive % 10 !== 1 || itemsActive % 11 === 0 ? 's' : ''
   } left`;
+
+  filterLogger(filter);
+  todosLogger(todos);
 }
 
-form.addEventListener('submit', e => {
-  e.preventDefault();
-
-  if (todoInput.value)
-    setTodos([
-      { id: state.todos.length + 1, title: todoInput.value, checked: false },
-      ...state.todos,
-    ]);
-});
-
 clearBtn.addEventListener('click', () => {
-  setTodos(state.todos.filter(({ checked }) => !checked));
+  setTodos({ list: todos.list.filter(({ checked }) => !checked) });
 
-  renderList();
+  renderTodosList();
 });
 
-allBtn.addEventListener('click', () => setFilter('all'));
-activeBtn.addEventListener('click', () => setFilter('active'));
-completedBtn.addEventListener('click', () => setFilter('completed'));
+allBtn.addEventListener('click', () => setFilter({ value: 'all' }));
+activeBtn.addEventListener('click', () => setFilter({ value: 'active' }));
+completedBtn.addEventListener('click', () => setFilter({ value: 'completed' }));
 
 function enableDragging() {
   let from;
@@ -159,65 +170,9 @@ function enableDragging() {
   document.addEventListener('drop', ({ target }) => {
     to = getDraggableParent(target)?.id;
     if (from && to && from !== to) {
-      const idxFrom = state.todos.findIndex(({ id }) => id == from);
-      const idxTo = state.todos.findIndex(({ id }) => id == to);
-      setTodos(moveArrayItem(state.todos, idxFrom, idxTo));
+      const idxFrom = todos.list.findIndex(({ id }) => id == from);
+      const idxTo = todos.list.findIndex(({ id }) => id == to);
+      setTodos({ list: moveArrayItem(todos.list, idxFrom, idxTo) });
     }
   });
-}
-
-/**
- * Moves an element within an array from one position to another.
- *
- * @param {Array} arr - The array in which the element should be moved.
- * @param {number} from - The current index of the element to move.
- * @param {number} to - The index to which the element should be moved.
- * @returns {Array} A new array with the element moved to the specified position.
- */
-function moveArrayItem(arr, from, to) {
-  const newArr = [...arr];
-  const [itemToMove] = newArr.splice(from, 1);
-  newArr.splice(to, 0, itemToMove);
-
-  return newArr;
-}
-
-/**
- * Fetches random to-do items from the Bacon Ipsum API and returns them as an array of objects.
- *
- * @param {Object} options - The options for generating random to-do items.
- * @param {number} [options.from=4] - The minimum number of sentences to fetch.
- * @param {number} [options.to=7] - The maximum number of sentences to fetch.
- * @param {number} [options.checkedRate=0.3] - The probability of a to-do item being checked (true).
- * @returns {Promise<Array>} A promise that resolves with an array of random to-do items.
- */
-function getRandomTodosFromBaconipsum({ from = 4, to = 7, checkedRate = 0.3 }) {
-  return Promise.resolve(fallbackTodos);
-  const todos = [];
-  const sentences = Math.floor(Math.random() * (to - from + 1) + from);
-  return fetch(
-    `https://baconipsum.com/api/?type=ameat-and-filler&sentences=${sentences}`,
-  )
-    .then(res => res.json())
-    .then(([txt]) => {
-      txt.split('.').forEach(title => {
-        const checked = Math.random() < checkedRate;
-        const id = todos.length + 1;
-        if (title) todos.push({ id, title, checked });
-      });
-      return todos;
-    });
-}
-
-function createLogger() {
-  const pre = document.createElement('pre');
-  pre.style = 'margin-top:5rem;margin-left: 1rem;';
-  body.appendChild(pre);
-
-  return function (item) {
-    pre.textContent =
-      typeof item === 'object'
-        ? JSON.stringify(item, null, 2)
-        : `logger: ${item ? item : 'nothing'}`;
-  };
 }
