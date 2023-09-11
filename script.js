@@ -33,7 +33,8 @@ const dragClassName = 'draggable';
 const body = document.querySelector('body');
 const themeBtn = document.querySelector('#theme');
 const form = document.querySelector('#form');
-const todoInput = document.querySelector('#todo-input');
+const todoInputTitle = document.querySelector('#todo-input-title');
+const todoInputChecked = document.querySelector('#todo-input-checked');
 const todosList = document.querySelector('#todos');
 const todosLeft = document.querySelector('#todos-left');
 const clearBtn = document.querySelector('#clear');
@@ -72,13 +73,18 @@ function renderNewTheme(theme) {
 form.addEventListener('submit', e => {
   e.preventDefault();
 
-  if (todoInput.value)
+  if (todoInputTitle.value)
     setTodos({
       list: [
-        { id: todos.list.length + 1, title: todoInput.value, checked: false },
+        {
+          id: todos.list.length + 1,
+          title: todoInputTitle.value,
+          checked: todoInputChecked.checked,
+        },
         ...todos.list,
       ],
     });
+  todoInputChecked.checked = false;
 });
 
 function renderTodos(todos) {
@@ -98,16 +104,14 @@ function renderTodos(todos) {
       li.classList.add(dragClassName);
       todosList.appendChild(li);
 
-      const checkedBtn = document.createElement('button');
-      checkedBtn.innerHTML = todo.checked
-        ? '<img src="images/icon-check.svg" alt="delete"/>'
-        : '';
-      checkedBtn.addEventListener('click', () => {
-        todo.checked = !todo.checked;
-        setTodos(todos.todos);
-        renderTodosList();
+      const checkedInput = document.createElement('input');
+      checkedInput.type = 'checkbox';
+      checkedInput.checked = todo.checked;
+      checkedInput.addEventListener('change', () => {
+        todo.checked = checkedInput.checked;
+        setTodos({ list: [...todos.list] });
       });
-      li.appendChild(checkedBtn);
+      li.appendChild(checkedInput);
 
       const title = document.createElement('p');
       title.textContent = todo.title;
@@ -115,11 +119,9 @@ function renderTodos(todos) {
 
       const delBtn = document.createElement('button');
       delBtn.innerHTML = '<img src="images/icon-cross.svg" alt="delete"/>';
-      delBtn.addEventListener('click', () => {
-        todos.todos = todos.todos.filter(element => element !== todo);
-        setTodos(todos.todos);
-        renderTodosList();
-      });
+      delBtn.addEventListener('click', () =>
+        setTodos({ list: todos.list.filter(element => element !== todo) }),
+      );
       li.appendChild(delBtn);
     });
 
