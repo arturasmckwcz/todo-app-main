@@ -7,19 +7,15 @@ import {
 import fallbackTodos from './fallbackTodos.js';
 
 const [todos, setTodos] = createState({
-  initialState: { list: fallbackTodos, filter: 'all', theme: 'light' },
-  validate: function ({ list }) {
-    return Array.isArray(list);
+  initialState: { list: [], filter: 'all' },
+  validate: function (todos) {
+    const { list, filter } = todos;
+    const isListValid = !list || Array.isArray(list);
+    const isFilterValid =
+      !filter || ['all', 'active', 'completed'].includes(filter);
+    return isListValid && isFilterValid;
   },
-  render: renderTodosList,
-});
-
-const [filter, setFilter] = createState({
-  initialState: { value: 'all' },
-  validate: function ({ value }) {
-    return ['all', 'active', 'completed'].includes(value);
-  },
-  render: renderTodosList,
+  render: renderTodos,
 });
 
 const [theme, setTheme] = createState({
@@ -31,7 +27,6 @@ const [theme, setTheme] = createState({
 });
 
 const todosLogger = createLogger('TODOS');
-const filterLogger = createLogger('FILTER');
 
 const dragClassName = 'draggable';
 
@@ -47,12 +42,14 @@ const activeBtn = document.querySelector('#active');
 const completedBtn = document.querySelector('#completed');
 
 window.addEventListener('load', () => {
-  renderTodosList();
+  setTodos({ list: fallbackTodos });
   return;
   getRandomTodosFromBaconipsum({})
     .then(todos => setTodos(todos))
-    .catch(console.error)
-    .finally(() => renderTodosList());
+    .catch(error => {
+      console.error(error);
+      setTodos({ list: fallbackTodos });
+    });
 });
 
 enableDragging();
@@ -84,13 +81,13 @@ form.addEventListener('submit', e => {
     });
 });
 
-function renderTodosList() {
+function renderTodos(todos) {
   todosList.innerHTML = '';
   todos.list
     .filter(({ checked }) =>
-      filter.value === 'active'
+      todos.filter === 'active'
         ? !checked
-        : filter.value === 'completed'
+        : todos.filter === 'completed'
         ? checked
         : true,
     )
@@ -131,7 +128,6 @@ function renderTodosList() {
     itemsActive % 10 !== 1 || itemsActive % 11 === 0 ? 's' : ''
   } left`;
 
-  filterLogger(filter);
   todosLogger(todos);
 }
 
@@ -141,9 +137,9 @@ clearBtn.addEventListener('click', () => {
   renderTodosList();
 });
 
-allBtn.addEventListener('click', () => setFilter({ value: 'all' }));
-activeBtn.addEventListener('click', () => setFilter({ value: 'active' }));
-completedBtn.addEventListener('click', () => setFilter({ value: 'completed' }));
+allBtn.addEventListener('click', () => setTodos({ filter: 'all' }));
+activeBtn.addEventListener('click', () => setTodos({ filter: 'active' }));
+completedBtn.addEventListener('click', () => setTodos({ filter: 'completed' }));
 
 function enableDragging() {
   let from;
