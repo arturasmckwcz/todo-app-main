@@ -16,39 +16,47 @@
 
     <title>Frontend Mentor | Todo app</title>
   </head>
-  <body>
-    <main class="containner">
+  <body class="light">
+    <main class="container">
       <header>
         <h1>TODO</h1>
         <button id="theme" class="theme">
           <img src="images/icon-moon.svg" alt="theme" />
         </button>
       </header>
+      <div class="tiles">
+        <form id="form">
+          <input type="checkbox" id="todo-input-checked" />
+          <input
+            type="text"
+            id="todo-input-title"
+            placeholder="Create a new todo..."
+          />
+        </form>
 
-      <form id="form">
-        <input type="checkbox" id="todo-input-checked" />
-        <input
-          type="text"
-          id="todo-input-title"
-          placeholder="Create a new todo..."
-        />
-      </form>
+        <ul id="todos" class="todos"></ul>
 
-      <ul id="todos" class="todos"></ul>
+        <footer>
+          <p id="todos-left">items left</p>
+          <button id="clear">Clear Completed</button>
+        </footer>
 
-      <div class="info-bar">
-        <p id="todos-left">items left</p>
-        <div class="filers">
-          <button id="all">All</button>
-          <button id="active">Active</button>
-          <button id="completed">Completed</button>
+        <div class="filters">
+          <span>
+            <input type="radio" name="filters" id="all" checked hidden />
+            <label for="all">All</label>
+          </span>
+          <span>
+            <input type="radio" name="filters" id="active" hidden />
+            <label for="active">Active</label>
+          </span>
+          <span>
+            <input type="radio" name="filters" id="completed" hidden />
+            <label for="completed">Completed</label>
+          </span>
         </div>
-        <button id="clear">Clear Completed</button>
       </div>
-
-      <footer>
-        <p>Drag and drop to reorder list</p>
-      </footer>
+      <p class="hint">Drag and drop to reorder list</p>
     </main>
   </body>
 </html>

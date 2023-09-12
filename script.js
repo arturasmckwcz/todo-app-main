@@ -26,7 +26,7 @@ const [theme, setTheme] = createState({
   render: renderNewTheme,
 });
 
-const todosLogger = createLogger('TODOS');
+// const todosLogger = createLogger('TODOS');
 
 const dragClassName = 'draggable';
 
@@ -130,7 +130,7 @@ function renderTodos(todos) {
     itemsActive % 10 !== 1 || itemsActive % 11 === 0 ? 's' : ''
   } left`;
 
-  todosLogger(todos);
+  // todosLogger(todos);
 }
 
 clearBtn.addEventListener('click', () => {
@@ -139,9 +139,11 @@ clearBtn.addEventListener('click', () => {
   renderTodosList();
 });
 
-allBtn.addEventListener('click', () => setTodos({ filter: 'all' }));
-activeBtn.addEventListener('click', () => setTodos({ filter: 'active' }));
-completedBtn.addEventListener('click', () => setTodos({ filter: 'completed' }));
+allBtn.addEventListener('change', () => setTodos({ filter: 'all' }));
+activeBtn.addEventListener('change', () => setTodos({ filter: 'active' }));
+completedBtn.addEventListener('change', () =>
+  setTodos({ filter: 'completed' }),
+);
 
 function enableDragging() {
   let from;
