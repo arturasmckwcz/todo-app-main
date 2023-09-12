@@ -26,8 +26,6 @@ const [theme, setTheme] = createState({
   render: renderNewTheme,
 });
 
-// const todosLogger = createLogger('TODOS');
-
 const dragClassName = 'draggable';
 
 const body = document.querySelector('body');
@@ -85,6 +83,7 @@ form.addEventListener('submit', e => {
       ],
     });
   todoInputChecked.checked = false;
+  todoInputTitle.value = '';
 });
 
 function renderTodos(todos) {
@@ -129,8 +128,6 @@ function renderTodos(todos) {
   todosLeft.textContent = `${itemsActive} item${
     itemsActive % 10 !== 1 || itemsActive % 11 === 0 ? 's' : ''
   } left`;
-
-  // todosLogger(todos);
 }
 
 clearBtn.addEventListener('click', () => {
