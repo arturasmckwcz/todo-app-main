@@ -17,7 +17,6 @@
 
 #sass compiler's stuff
 .sass-cache/
-*.css
 *.css.map
 
 #vscode stuff
