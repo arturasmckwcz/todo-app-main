@@ -123,12 +123,11 @@ body {
   }
 
   input[type="checkbox"] {
-    --sz-inp-p-left: calc(var(--sz-ch-box) / 2 - 1px + var(--sz-gap-tile));
-
     position: relative;
     appearance: none;
-    padding-left: var(--sz-inp-p-left);
+    padding-left: calc(var(--sz-ch-box) / 2 - 1px + var(--sz-gap-tile));
   }
+
   input[type="checkbox"]::after {
     position: absolute;
     content: "";
@@ -138,13 +137,23 @@ body {
     border: solid 1px var(--clr-dim-light);
     transform: translate(-20px, -50%);
   }
+
   input[type="checkbox"]:checked ~ p {
     color: var(--clr-dim);
     font-weight: 400;
     text-decoration: line-through;
   }
+
   input[type="checkbox"]:checked::after {
     background: no-repeat center var(--svg-icon-check), var(--clr-check-bg);
+  }
+
+  input[type="checkbox"]:hover::after {
+    border: double 1px transparent;
+    background-image: linear-gradient(var(--clr-tiles-bg), var(--clr-tiles-bg)),
+      var(--clr-check-bg);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
   }
 
   ul {
@@ -168,6 +177,10 @@ body {
     height: var(--sz-h-tile);
   }
 
+  li:hover {
+    cursor: pointer;
+  }
+
   li::after,
   footer::after {
     content: "";
@@ -181,6 +194,7 @@ body {
     bottom: -1px;
     background-color: var(--clr-dim-light);
   }
+
   footer::after {
     bottom: 0;
     left: var(--sz-m-inl);
@@ -201,6 +215,11 @@ body {
 
   li > button > img {
     width: var(--sz-del-tile);
+  }
+
+  li > button,
+  li > input {
+    cursor: pointer;
   }
 
   input[type="text"] {
@@ -238,6 +257,11 @@ body {
     color: var(--clr-dim-dark);
     font-size: inherit;
   }
+
+  footer > button:hover {
+    cursor: pointer;
+    color: var(--clr-front);
+  }
 }
 
 .filters {
@@ -259,6 +283,11 @@ body {
 
   input[type="radio"]:checked + label {
     color: var(--clr-prim);
+  }
+
+  label:hover {
+    cursor: pointer;
+    color: var(--clr-front);
   }
 }
 
@@ -329,6 +358,10 @@ body {
       background: none;
 
       transform: translateY(calc(-100% - var(--sz-m-tile)));
+    }
+
+    footer > button {
+      z-index: 1;
     }
   }
 
