@@ -43,7 +43,7 @@ export function getRandomTodosFromBaconipsum({
             .split(" ")
             .reduce(
               (title, word) =>
-                (title.split(" ").length < 13
+                (title.split(" ").length <= 10
                   ? title + " " + word
                   : title
                 ).trim(),
