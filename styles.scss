@@ -324,7 +324,7 @@ body {
   --clr-shd: #000;
 }
 
-@media (min-width: 376px) {
+@media (min-width: 480px) {
   body {
     --img-bg-light: var(--img-bg-desktop-light);
     --img-bg-dark: var(--img-bg-desktop-dark);
@@ -335,7 +335,6 @@ body {
     --sz-m-inl: 20px;
     --sz-m-blc: 78px;
     --sz-max-w: 540px;
-    --sz-min-w: calc(542px + 2 * var(--sz-m-inl));
     --sz-max-h: 674px;
     --sz-ch-box: 18px;
     --sz-gap-tile: 12px;
