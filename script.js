@@ -94,7 +94,7 @@ function renderTodos(todos) {
         ? checked
         : true,
     )
-    .forEach(todo => {
+    .forEach((todo, idx) => {
       const li = document.createElement("li");
       li.draggable = true;
       li.id = todo.id;
@@ -104,11 +104,15 @@ function renderTodos(todos) {
       const checkedInput = document.createElement("input");
       checkedInput.type = "checkbox";
       checkedInput.checked = todo.checked;
+      checkedInput.id = "todo-" + (idx + 1);
       checkedInput.addEventListener("change", () => {
         todo.checked = checkedInput.checked;
         setTodos({ list: [...todos.list] });
       });
       li.appendChild(checkedInput);
+      const label = document.createElement("label");
+      label.setAttribute("for", checkedInput.id);
+      li.appendChild(label);
 
       const title = document.createElement("p");
       title.textContent = todo.title;
