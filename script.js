@@ -126,7 +126,7 @@ function renderTodos(todos) {
       const delBtn = document.createElement("button");
       delBtn.innerHTML = '<img src="images/icon-cross.svg" alt="delete"/>';
       delBtn.addEventListener("click", () =>
-        setTodos({ list: todos.list.filter(element => element !== todo) }),
+        setTodos({ list: todos.list.filter(_todo => _todo.id !== todo.id) }),
       );
       li.appendChild(delBtn);
     });
@@ -137,11 +137,9 @@ function renderTodos(todos) {
   } left`;
 }
 
-clearBtn.addEventListener("click", () => {
-  setTodos({ list: todos.list.filter(({ checked }) => !checked) });
-
-  renderTodosList();
-});
+clearBtn.addEventListener("click", () =>
+  setTodos({ list: todos.list.filter(({ checked }) => !checked) }),
+);
 
 allBtn.addEventListener("change", () => setTodos({ filter: "all" }));
 activeBtn.addEventListener("change", () => setTodos({ filter: "active" }));
