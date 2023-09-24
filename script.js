@@ -105,10 +105,15 @@ function renderTodos(todos) {
       checkedInput.type = "checkbox";
       checkedInput.checked = todo.checked;
       checkedInput.id = "todo-" + (idx + 1);
-      checkedInput.addEventListener("change", () => {
-        todo.checked = checkedInput.checked;
-        setTodos({ list: [...todos.list] });
-      });
+      checkedInput.addEventListener("change", () =>
+        setTodos({
+          list: todos.list.map(_todo =>
+            _todo.id === todo.id
+              ? { ..._todo, checked: checkedInput.checked }
+              : _todo,
+          ),
+        }),
+      );
       li.appendChild(checkedInput);
       const label = document.createElement("label");
       label.setAttribute("for", checkedInput.id);
