@@ -21,7 +21,8 @@ export function moveArrayItem(arr, from, to) {
  * @param {number} [options.from=4] - The minimum number of sentences to fetch.
  * @param {number} [options.to=7] - The maximum number of sentences to fetch.
  * @param {number} [options.checkedRate=0.3] - The probability of a to-do item being checked (true).
- * @returns {Promise<Array>} A promise that resolves with an array of random to-do items.
+ * @returns {Promise<Array>} A promise that resolves with an array of random todo items title of each is
+ *                           of 12 or less words.
  */
 export function getRandomTodosFromBaconipsum({
   from = 4,
@@ -34,12 +35,26 @@ export function getRandomTodosFromBaconipsum({
     `https://baconipsum.com/api/?type=ameat-and-filler&sentences=${sentences}`,
   )
     .then(res => res.json())
-    .then(([txt]) => {
-      txt.split('.').forEach(title => {
-        const checked = Math.random() < checkedRate;
-        const id = todos.length + 1;
-        if (title) todos.push({ id, title, checked });
-      });
+    .then(([sentences]) => {
+      sentences
+        .split(".")
+        .map(sentence =>
+          sentence
+            .split(" ")
+            .reduce(
+              (title, word) =>
+                (title.split(" ").length < 13
+                  ? title + " " + word
+                  : title
+                ).trim(),
+              "",
+            ),
+        )
+        .forEach(title => {
+          const checked = Math.random() < checkedRate;
+          const id = todos.length + 1;
+          if (title) todos.push({ id, title, checked });
+        });
       return todos;
     });
 }
@@ -61,9 +76,9 @@ export function getRandomTodosFromBaconipsum({
  * myLogger({ key: 'value' });
  */
 export function createLogger(title) {
-  const pre = document.createElement('pre');
-  pre.style = 'margin:2rem';
-  document.querySelector('body').appendChild(pre);
+  const pre = document.createElement("pre");
+  pre.style = "margin:2rem";
+  document.querySelector("body").appendChild(pre);
 
   /**
    * @param {any} item - The item to be logged.
@@ -71,8 +86,8 @@ export function createLogger(title) {
   return function (item) {
     pre.textContent =
       `${title}:\n` +
-      (typeof item === 'object'
+      (typeof item === "object"
         ? JSON.stringify(item, null, 2)
-        : `logger: ${item ? item : 'nothing'}`);
+        : `logger: ${item ? item : "nothing"}`);
   };
 }
