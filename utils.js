@@ -29,6 +29,7 @@ export function getRandomTodosFromBaconipsum({
   to = 7,
   checkedRate = 0.3,
 }) {
+  // return Promise.reject("While debugging");
   const todos = [];
   const sentences = Math.floor(Math.random() * (to - from + 1) + from);
   return fetch(
@@ -43,7 +44,7 @@ export function getRandomTodosFromBaconipsum({
             .split(" ")
             .reduce(
               (title, word) =>
-                (title.split(" ").length <= 10
+                (title.split(" ").length <= 6
                   ? title + " " + word
                   : title
                 ).trim(),
