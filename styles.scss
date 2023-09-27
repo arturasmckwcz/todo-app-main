@@ -157,6 +157,10 @@ body {
     background-clip: content-box, border-box;
   }
 
+  input[type="checkbox"]:hover:checked::after {
+    background: no-repeat center var(--svg-icon-check), var(--clr-check-bg);
+  }
+
   ul {
     background: none;
   }
