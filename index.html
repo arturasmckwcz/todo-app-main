@@ -26,12 +26,16 @@
       </header>
       <div class="tiles">
         <form id="form">
-          <input type="checkbox" id="todo-input-checked" />
-          <label for="todo-input-checked"></label>
+          <input
+            type="checkbox"
+            id="todo-input-checked"
+            aria-label="is-todo-checked"
+          />
           <input
             type="text"
             id="todo-input-title"
             placeholder="Create a new todo..."
+            aria-label="create-todo"
           />
         </form>
 

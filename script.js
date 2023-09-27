@@ -104,7 +104,7 @@ function renderTodos(todos) {
       const checkedInput = document.createElement("input");
       checkedInput.type = "checkbox";
       checkedInput.checked = todo.checked;
-      checkedInput.id = "todo-" + (idx + 1);
+      checkedInput.setAttribute("aria-label", "is-todo-checked");
       checkedInput.addEventListener("change", () =>
         setTodos({
           list: todos.list.map(_todo =>
@@ -115,9 +115,6 @@ function renderTodos(todos) {
         }),
       );
       li.appendChild(checkedInput);
-      const label = document.createElement("label");
-      label.setAttribute("for", checkedInput.id);
-      li.appendChild(label);
 
       const title = document.createElement("p");
       title.textContent = todo.title;
